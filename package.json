@@ -1,31 +1,27 @@
 {
-    "name": "alligator-auth",
-    "version": "0.0.1",
-    "description": "Utilities and wrappers for interacting with my self hosted auth server.",
-    "keywords": [
-        "auth",
-        "typescript",
-        "react",
-        "jwt"
-    ],
-    "license": "MIT",
-    "homepage": "https://github.com/callumk7/alligator-auth",
-    "scripts": {
-        "build": "tsc"
-    },
-    "bugs": {
-        "url": "https://github.com/callumk7/alligator-auth/issues"
-    },
-    "author": "Callum Kloos <callumkloos@gmail.com> (https://callumkloos.dev)",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/callumk7/alligator-auth.git"
-    },
-    "files": [
-        "dist"
-    ],
-    "type": "module",
-    "devDependencies": {
-        "typescript": "^5.7.3"
-    }
+	"name": "alligator-auth",
+	"version": "0.0.1",
+	"description": "Utilities and wrappers for interacting with my self hosted auth server.",
+	"keywords": ["auth", "typescript", "react", "jwt"],
+	"license": "MIT",
+	"homepage": "https://github.com/callumk7/alligator-auth",
+	"scripts": {
+		"build": "tsc",
+		"ci": "pnpm build",
+		"lint": "biome check --write"
+	},
+	"bugs": {
+		"url": "https://github.com/callumk7/alligator-auth/issues"
+	},
+	"author": "Callum Kloos <callumkloos@gmail.com> (https://callumkloos.dev)",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/callumk7/alligator-auth.git"
+	},
+	"files": ["dist"],
+	"type": "module",
+	"devDependencies": {
+		"@biomejs/biome": "^1.9.4",
+		"typescript": "^5.7.3"
+	}
 }
