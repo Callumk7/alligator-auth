@@ -1,12 +1,17 @@
-type RedirectFunction = (url: string, init?: number | ResponseInit) => Response;
+interface UserData {
+	id: number;
+	email: string;
+	role: string;
+	tenant_id: number;
+	inserted_at: string;
+	updated_at: string;
+}
 
-export class TenantAuthenticationService {
+export class AlligatorServer {
 	private baseAuthUrl: string;
-	private redirect: RedirectFunction;
 
-	constructor(baseAuthUrl: string, redirect: RedirectFunction) {
+	constructor(baseAuthUrl: string) {
 		this.baseAuthUrl = baseAuthUrl;
-		this.redirect = redirect;
 	}
 
 	/**
@@ -14,7 +19,7 @@ export class TenantAuthenticationService {
 	 * The request is sent to the authentication server, and it returns either
 	 * a redirect, or 200 "Verified";
 	 */
-	async verifyTokenForLoader(request: Request) {
+	async verifyTokenForLoader(request: Request): Promise<Response> {
 		try {
 			const response = await fetch(`${this.baseAuthUrl}/protected/verify`, {
 				method: "GET",
@@ -24,12 +29,12 @@ export class TenantAuthenticationService {
 			});
 
 			if (!response.ok) {
-				return this.redirect("/login");
+				return new Response("Unauthorized", { status: 401 });
 			}
 
-			return new Response("Verified", { status: 200 });
+			return new Response("Authorized", { status: 200 });
 		} catch (error) {
-			return this.redirect("/login");
+			return new Response("Unauthorized", { status: 401 });
 		}
 	}
 
@@ -38,7 +43,7 @@ export class TenantAuthenticationService {
 	 * will include all user details from the authentication server.
 	 * If the response is not OK, then a refresh attempt is made.
 	 */
-	async getUserFromRequest(request: Request): Promise<Response> {
+	async getUserFromRequest(request: Request): Promise<UserData> {
 		try {
 			const response = await fetch(`${this.baseAuthUrl}/protected/me`, {
 				method: "GET",
@@ -48,26 +53,14 @@ export class TenantAuthenticationService {
 			});
 
 			if (!response.ok) {
-				const refreshResult = await this.refreshTokens(request);
-
-				if (!refreshResult.tokenRefreshed) {
-					return new Response(
-						JSON.stringify({ error: "Authentication Failed" }),
-						{
-							status: 401,
-							headers: { "Content-Type": "application/json" },
-						},
-					);
-				}
-
-				return await this.getUserFromRequest(
-					this.recreateRequest(request, refreshResult.headers),
-				);
+				throw new Error("Unable to authorize request");
 			}
 
-			return await response.json();
+			const data = await response.json();
+			console.log(data);
+			return data;
 		} catch (error) {
-			return this.redirect("/login");
+			throw new Error("Unable to authorize request");
 		}
 	}
 
@@ -172,6 +165,9 @@ export class TenantAuthenticationService {
 				return { tokenRefreshed: false };
 			}
 
+			console.log("refresh attempt headers:");
+			console.log(refreshResponse.headers);
+
 			return {
 				tokenRefreshed: true,
 				headers: refreshResponse.headers,
@@ -196,11 +192,13 @@ export class TenantAuthenticationService {
 		if (headers) {
 			const setCookieHeaders = headers.getSetCookie();
 
+			const newHeaders = new Headers(requestInit.headers);
+			setCookieHeaders.forEach((cookieHeader) => {
+				newHeaders.append("Cookie", cookieHeader);
+			});
+
 			// Modify headers to include the new cookies
-			requestInit.headers = {
-				...requestInit.headers,
-				Cookie: setCookieHeaders.join("; "),
-			};
+			requestInit.headers = newHeaders;
 		}
 
 		return new Request(request.url, requestInit);
