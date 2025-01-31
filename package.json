@@ -7,7 +7,8 @@
 	"homepage": "https://github.com/callumk7/alligator-auth",
 	"scripts": {
 		"build": "tsc",
-		"ci": "pnpm build",
+		"ci": "pnpm build && pnpm check",
+		"check": "biome check",
 		"lint": "biome check --write"
 	},
 	"bugs": {
