@@ -32,8 +32,22 @@ export class Alligator {
 		return false;
 	}
 
+	async verify(): Promise<boolean> {
+		const res = await this.fetch("/protected/verify", "GET");
+
+		if (res.ok) {
+			return true;
+		}
+
+		return false;
+	}
+
 	async logout(): Promise<void> {
-		//TODO: Complete logout functionality, review server implementation
+		const res = await this.fetch("/logout", "POST");
+
+		if (res.ok) {
+			this.isAuthenticated = false;
+		}
 	}
 
 	async getCurrentUser(): Promise<UserData> {
@@ -41,14 +55,6 @@ export class Alligator {
 		if (res.ok) return (await res.json()) as UserData;
 
 		throw new Error("Failed to fetch data");
-	}
-
-	hasCookies() {
-		const cookies = document.cookie;
-		const accessToken = extractCookie(cookies, "access_token");
-		const refreshToken = extractCookie(cookies, "refresh_token");
-
-		return !!accessToken && !!refreshToken;
 	}
 
 	private async fetch(endpoint: string, method: string, body?: string) {
