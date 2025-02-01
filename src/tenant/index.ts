@@ -1,11 +1,39 @@
-import type { UserData } from "../types.js";
+import type { UserCredentials, UserData } from "../types.js";
 import { extractCookie, getCookies } from "../utils.js";
 
 export class AlligatorServer {
-	private baseAuthUrl: string;
+	private baseAuthUrl = "http://localhost:4000/api";
+	private tenantId: number;
 
-	constructor(baseAuthUrl: string) {
-		this.baseAuthUrl = baseAuthUrl;
+	constructor(tenantId: number) {
+		this.tenantId = tenantId;
+	}
+
+    // If this is going to interact with a client application, then the whole response needs to 
+    // be returned to the client, so that the cookies can be correctly set. This isn't hugely 
+    // clear from a client API perspective - but for those use cases we have the client side 
+    // package that would work better for initially setting the cookies for the user. 
+	async login({ email, password }: UserCredentials): Promise<Response> {
+		try {
+			const res = await fetch(`${this.baseAuthUrl}/login`, {
+				method: "POST",
+				credentials: "include",
+				body: JSON.stringify({ email, password, tenant_id: this.tenantId }),
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+
+			if (res.ok) {
+				return res;
+			}
+
+			console.error("Failed to login");
+			return new Response("Unauthorized", { status: 415 });
+		} catch (error) {
+			console.error(error);
+			return new Response("Server Error", { status: 500 });
+		}
 	}
 
 	/**
