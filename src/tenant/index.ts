@@ -1,11 +1,5 @@
-interface UserData {
-	id: number;
-	email: string;
-	role: string;
-	tenant_id: number;
-	inserted_at: string;
-	updated_at: string;
-}
+import type { UserData } from "../types.js";
+import { extractCookie, getCookies } from "../utils.js";
 
 export class AlligatorServer {
 	private baseAuthUrl: string;
@@ -101,18 +95,6 @@ export class AlligatorServer {
 		}
 	}
 
-	private getCookies(request: Request): string {
-		return request.headers.get("cookie") || "";
-	}
-
-	private extractCookie(cookies: string, key: string): string | undefined {
-		const cookieMap = new Map(
-			cookies.split("; ").map((cookie) => {
-				const [name = "", value = ""] = cookie.split("=");
-				return [name, decodeURIComponent(value)];
-			}),
-		);
-
-		return cookieMap.get(key);
-	}
+	private getCookies = getCookies;
+	private extractCookie = extractCookie;
 }
