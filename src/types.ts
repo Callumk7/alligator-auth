@@ -6,3 +6,8 @@ export interface UserData {
 	inserted_at: string;
 	updated_at: string;
 }
+
+export interface UserCredentials {
+	email: string;
+	password: string;
+}

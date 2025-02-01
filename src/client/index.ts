@@ -1,10 +1,4 @@
-import type { UserData } from "../types.js";
-import { extractCookie } from "../utils.js";
-
-interface UserCredentials {
-	email: string;
-	password: string;
-}
+import type { UserCredentials, UserData } from "../types.js";
 
 export class Alligator {
 	private tenantId: number;
