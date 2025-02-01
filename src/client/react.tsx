@@ -47,4 +47,6 @@ export function useAlligator() {
       "useAlligator must be used within an AlligatorProvider higher up in the component tree.",
     );
   }
+
+  return context;
 }
