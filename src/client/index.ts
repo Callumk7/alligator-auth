@@ -26,6 +26,23 @@ export class Alligator {
 		return false;
 	}
 
+	async register(credentials: UserCredentials): Promise<boolean> {
+		const { email, password } = credentials;
+		const res = await this.fetch(
+			"/register",
+			"POST",
+			JSON.stringify({ email, password, tenant_id: this.tenantId }),
+		);
+
+		if (res.ok) {
+			this.isAuthenticated = true;
+			return true;
+		}
+
+		this.isAuthenticated = false;
+		return false;
+	}
+
 	async verify(): Promise<boolean> {
 		const res = await this.fetch("/protected/verify", "GET");
 

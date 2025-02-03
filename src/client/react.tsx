@@ -15,6 +15,7 @@ const AlligatorContext = createContext<{
   isAuthenticated: boolean;
   getCurrentUser: () => Promise<void>;
   login: (email: string, password: string) => Promise<boolean>;
+  register: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
 } | null>(null);
 
@@ -58,6 +59,19 @@ export function AlligatorProvider({
     [client, getCurrentUser],
   );
 
+  const register = useCallback(
+    async (email: string, password: string) => {
+      const isRegistered = await client.register({ email, password });
+      if (isRegistered) {
+        await getCurrentUser();
+        return true;
+      }
+      console.error("Unable to log in for some reason");
+      return false;
+    },
+    [client, getCurrentUser],
+  );
+
   const logout = useCallback(async () => {
     await client.logout();
     setIsAuthenticated(false);
@@ -66,7 +80,7 @@ export function AlligatorProvider({
 
   return (
     <AlligatorContext.Provider
-      value={{ client, user, isAuthenticated, getCurrentUser, login, logout }}
+      value={{ client, user, isAuthenticated, getCurrentUser, login, register, logout }}
     >
       {children}
     </AlligatorContext.Provider>

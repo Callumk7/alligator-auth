@@ -9,10 +9,32 @@ export class AlligatorServer {
 		this.tenantId = tenantId;
 	}
 
-    // If this is going to interact with a client application, then the whole response needs to 
-    // be returned to the client, so that the cookies can be correctly set. This isn't hugely 
-    // clear from a client API perspective - but for those use cases we have the client side 
-    // package that would work better for initially setting the cookies for the user. 
+	async register({ email, password }: UserCredentials): Promise<Response> {
+		try {
+			const res = await fetch(`${this.baseAuthUrl}/register`, {
+				headers: {
+					"Content-Type": "application/json",
+				},
+				credentials: "include",
+				body: JSON.stringify({ email, password, tenant_id: this.tenantId }),
+			});
+
+			if (res.ok) {
+				return res;
+			}
+
+			console.error("Failed to register user");
+			return new Response("Failed to register user", { status: 400 });
+		} catch (error) {
+			console.error("Failed to register user, with error: ", error);
+			return new Response("Failed to register user", { status: 400 });
+		}
+	}
+
+	// If this is going to interact with a client application, then the whole response needs to
+	// be returned to the client, so that the cookies can be correctly set. This isn't hugely
+	// clear from a client API perspective - but for those use cases we have the client side
+	// package that would work better for initially setting the cookies for the user.
 	async login({ email, password }: UserCredentials): Promise<Response> {
 		try {
 			const res = await fetch(`${this.baseAuthUrl}/login`, {
@@ -78,9 +100,8 @@ export class AlligatorServer {
 				throw new Error("Unable to authorize request");
 			}
 
-			const data = await response.json();
-			console.log(data);
-			return data;
+			// TODO: Validation? Probably not, just testing
+			return response.json();
 		} catch (error) {
 			throw new Error("Unable to authorize request");
 		}

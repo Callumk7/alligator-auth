@@ -1,6 +1,7 @@
 export interface UserData {
 	id: number;
 	email: string;
+	external_id?: string | null;
 	role: string;
 	tenant_id: number;
 	inserted_at: string;
