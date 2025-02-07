@@ -9,17 +9,27 @@ export class AlligatorServer {
 		this.tenantId = tenantId;
 	}
 
-	async register({ email, password }: UserCredentials): Promise<Response> {
+	async register(
+		{ email, password }: UserCredentials,
+		externalId?: string,
+	): Promise<Response> {
 		try {
 			const res = await fetch(`${this.baseAuthUrl}/register`, {
+				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
 				credentials: "include",
-				body: JSON.stringify({ email, password, tenant_id: this.tenantId }),
+				body: JSON.stringify({
+					email,
+					password,
+					tenant_id: this.tenantId,
+					external_id: externalId,
+				}),
 			});
 
 			if (res.ok) {
+				console.log("res ok");
 				return res;
 			}
 
